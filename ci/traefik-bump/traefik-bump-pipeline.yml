@@ -41,7 +41,7 @@ resources:
 jobs:
   - name: detect
     plan:
-      - aggregate:
+      - in_parallel:
         - get: traefik-gh-release
           trigger: true
           params: { globs: [ "*_linux-amd64" ] }

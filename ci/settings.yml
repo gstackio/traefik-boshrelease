@@ -10,6 +10,24 @@ meta:
 
   manifest:
     directory: deployment
+    vars: |
+      ---
+      deployment_name: traefik-testflight
+      network_name: default
+      traefik_domain: example.com
+      api_username: admin-testflight
+      smoke_tests_frontend_hostname: mockbin.example.com
+    vars-pr: |
+      ---
+      deployment_name: traefik-testflight-pr
+      network_name: default
+      traefik_domain: example.com
+      api_username: admin-testflight
+      smoke_tests_frontend_hostname: mockbin.example.com
+    operator_file_paths:
+      deployment/operations/testflight/smoke-tests-setup.yml
+      deployment/operations/enable-api.yml
+      deployment/operations/enable-rest.yml
 
   git:
     email:  ((git-commit-email))
@@ -33,6 +51,12 @@ meta:
     branch: master
     private_key:  ((github-private-key))
     access_token: ((github-access-token))
+
+  bosh:
+    stemcell:
+      cpi: "warden-boshlite"
+
+  test-errands: smoke-tests
 
   slack:
     webhook:       ((slack-webhook))

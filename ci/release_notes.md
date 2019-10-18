@@ -7,3 +7,8 @@
 
 - Bump stemcell family to v456.x, and create Træfik compiled releases based
   the latest stemcell from this family.
+
+
+### Breaking Changes
+
+- The `traefik-deployment.yml` manifest name is standardized to `traefik.yml`

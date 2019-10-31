@@ -1,5 +1,7 @@
 ### Improvements
 
+- Bump Træfik to the latest version [1.7.19](https://github.com/containous/traefik/releases/tag/v1.7.19)
+
 - Have the smoke tests fail when running them with `traefik.rest.enabled` set
   to `false`, as they depend in the REST backend to be opted-in.
 

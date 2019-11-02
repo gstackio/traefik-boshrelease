@@ -64,11 +64,11 @@ stemcells:
 
 releases:
 - name: traefik
-  sha1: 5ea2c9430b805763aec73d4d8980af5b7ed77337
+  sha1: fb4d4397d6b9fcba1846d005757585a4612c3bd7
   stemcell:
     os: ubuntu-xenial
-    version: "456.30"
-  url: https://github.com/gstackio/traefik-boshrelease/releases/download/v1.9.0/traefik-1.9.0.tgz
+    version: "456.51"
+  url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.9.0-ubuntu-xenial-456.51-20191102-222919-184922902-20191102222920.tgz
   version: 1.9.0
 - name: bpm
   sha1: b41556af773ea9aec93dd21a9bbf129200849eed

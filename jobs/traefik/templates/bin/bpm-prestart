@@ -16,6 +16,7 @@ readonly JOB_NAME=traefik
 readonly \
     LOG_DIR=/var/vcap/sys/log/${JOB_NAME} \
     JOB_DIR=/var/vcap/jobs/${JOB_NAME} \
+    PKG_DIR=/var/vcap/packages/${JOB_NAME} \
     STORE_DIR=/var/vcap/store/${JOB_NAME}
 
 
@@ -42,3 +43,32 @@ fi
 if [[ -f "${STORE_DIR}/acme/acme-data.json" ]]; then
     chown vcap:vcap "${STORE_DIR}/acme/acme-data.json"
 fi
+
+
+
+<%
+    require "shellwords"
+    def esc(x)
+        Shellwords.shellescape(x)
+    end
+
+    if p('traefik.consul.enabled')
+        # NOTE: here we choose to always render the code for uploading Traefik
+        # configuration to the Consul Key-Value store, instead of only
+        # rendering it on the bootstrap node.
+        #
+        # We do this because we think it is easier to debug.
+        #
+        # Plus, always providing such code allows operators to manually upload
+        # such configuration whenever the bootstrap node would be destroyed in
+        # a disaster scenario. In such situation, changing the Bash variables
+        # below and manually run this script on some other node could be of
+        # help.
+-%>
+is_bootstrap_node=<%= esc(spec.bootstrap) %>
+if [[ ${is_bootstrap_node} == "true" ]]; then
+    # Upload the static Traefik configuration into the Key-value store.
+    "${PKG_DIR}/bin/traefik" storeconfig \
+        --configfile="${JOB_DIR}/conf/traefik.toml"
+fi
+<%  end -%>

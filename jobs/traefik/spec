@@ -15,6 +15,9 @@ templates:
   tls/web-backend.key: tls/web-backend.key
   tls/api-entrypoint.crt: tls/api-entrypoint.crt
   tls/api-entrypoint.key: tls/api-entrypoint.key
+  tls/consul-ca-bundle.crt: tls/consul-ca-bundle.crt
+  tls/consul-client.crt: tls/consul-client.crt
+  tls/consul-client.key: tls/consul-client.key
 
 packages:
   - traefik
@@ -34,6 +37,13 @@ provides:
       - traefik.api.digest_auth.username
       - traefik.api.digest_auth.password
       - traefik.rest.enabled
+  - name: traefik-address
+    type: address
+
+consumes:
+  - name: consul-servers
+    type: consul
+    optional: true
 
 properties:
   bpm.enabled:
@@ -316,3 +326,43 @@ properties:
     description: |
       Whether Traefik should watch the rules file for any dynamic change.
     default: false
+
+
+  traefik.consul.enabled:
+    description: |
+      Wether Traefik clustering should be enabled, with configuration in
+      Consul Key-Value store.
+
+      When this property is set to 'true', the 'consul-servers' link must
+      resolve to an instance group of Consul servers.
+    default: false
+
+  traefik.consul.disable_acme_local_storage_file:
+    description: |
+      After the ACME certificates have been uploaded once to the KV store, the
+      'storage' directive in '[acme]' section of the Traefik config file
+      should be removed.
+
+      After adopting 'traefik.consul.enabled' and successfully deploy Traefik,
+      this property should be set to 'true' and Traefik should be re-deployed.
+    default: false
+
+  traefik.consul.prefix:
+    description: |
+      The namespace prefix to use when storing Traefik cluster configuration
+      in Consul Key-Value store.
+    default: traefik
+
+  traefik.consul.client_cert:
+    type: certificate
+    description: |
+      The client certificate to use when authenticating to Consul.
+
+  traefik.consul.ca_bundle:
+    description: |
+      The concatenated CA certificates to trust. Specifying both old and new
+      CA certificates here is essential for rotating CA certificates.
+
+      When this property is not specified, the trusted Certificate Authority
+      defaults to the CA certificate of the 'traefik.consul.client_cert'
+      certificate.

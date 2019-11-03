@@ -1,0 +1,1 @@
+<%= p("traefik.consul.ca_bundle", p("traefik.consul.client_cert.ca", "")) %>

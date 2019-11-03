@@ -49,7 +49,7 @@ features:
   use_dns_addresses: true
 
 update:
-  serial: true # instance groups to be deployed sequentially.
+  serial: false
 
   canaries: 1
   canary_watch_time: 1000-5000

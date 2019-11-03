@@ -626,11 +626,25 @@ email = "<%= p('traefik.acme.certs_email') %>"
 #
 # storage = "acme.json"
 # or `storage = "traefik/acme/account"` if using KV store.
-<%   if p('traefik.acme.staging') -%>
-storage = "/var/vcap/store/traefik/acme/acme-staging-data.json"
-<%   else -%>
-storage = "/var/vcap/store/traefik/acme/acme-data.json"
-<%   end -%>
+<%
+    if p('traefik.acme.staging')
+      storage_file = "/var/vcap/store/traefik/acme/acme-staging-data.json"
+    else
+      storage_file = "/var/vcap/store/traefik/acme/acme-data.json"
+    end
+
+    if p('traefik.consul.enabled')
+-%>
+# the key where to store your certificates in the KV store
+storage = "<%= p('traefik.consul.prefix') %>/acme/account"
+<%    if !p('traefik.consul.disable_acme_local_storage_file') -%>
+storageFile = "<%= storage_file %>" # your old certificates store
+<%
+      end
+    else
+-%>
+storage = "<%= storage_file %>"
+<%  end -%>
 
 # Entrypoint to proxy acme apply certificates to.
 # WARNING, must point to an entrypoint on port 443
@@ -936,4 +950,71 @@ filename = "/var/vcap/jobs/traefik/conf/rules.toml"
 # Optional
 #
 watch = <%= p('traefik.file.watch') %>
+<% end -%>
+
+
+
+<% if p('traefik.consul.enabled') -%>
+################################################################
+# Consul KV Provider
+################################################################
+
+# Enable Consul KV Provider.
+[consul]
+<%
+    consul_servers = link('consul-servers')
+    if !consul_servers.p("server")
+      raise "The Consul instances provided by the 'consul-servers' link are not Consul servers."
+    end
+-%>
+
+# Consul server endpoint.
+#
+# Required
+# Default: "127.0.0.1:8500"
+#
+endpoint = "<%= consul_servers.address %>:<%= consul_servers.p('tls.enabled') ? 8501 : 8500 %>"
+
+# Enable watch Consul changes.
+#
+# Optional
+# Default: true
+#
+watch = true
+
+# Prefix used for KV store.
+#
+# Optional
+# Default: traefik
+#
+prefix = "<%= p('traefik.consul.prefix') %>"
+
+# Override default configuration template.
+# For advanced users :)
+#
+# Optional
+#
+# filename = "consul.tmpl"
+
+# Use Consul user/pass authentication.
+#
+# Optional
+#
+# username = foo
+# password = bar
+
+# Enable Consul TLS connection.
+#
+# Optional
+#
+#    [consul.tls]
+#    ca = "/etc/ssl/ca.crt"
+#    cert = "/etc/ssl/consul.crt"
+#    key = "/etc/ssl/consul.key"
+#    insecureSkipVerify = true
+  [consul.tls]
+  ca = "/var/vcap/jobs/traefik/tls/consul-ca-bundle.crt"
+  cert = "/var/vcap/jobs/traefik/tls/consul-client.crt"
+  key = "/var/vcap/jobs/traefik/tls/consul-client.key"
+  insecureSkipVerify = true
 <% end -%>

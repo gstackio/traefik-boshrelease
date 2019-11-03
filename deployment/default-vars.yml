@@ -1,3 +1,4 @@
 ---
 deployment_name: traefik
 network_name: default
+traefik_domain: example.com

@@ -29,6 +29,16 @@ meta:
       deployment/operations/enable-api.yml
       deployment/operations/enable-rest.yml
 
+    vars-clustering: |
+      ---
+      deployment_name: traefik-testflight-clustering
+      network_name: default
+      traefik_domain: example.com
+      api_username: admin-testflight
+      smoke_tests_frontend_hostname: mockbin.example.com
+    operator_file_paths-clustering:
+      deployment/operations/clustering.yml
+
   git:
     email:  ((git-commit-email))
     name:   ((git-commit-name))
@@ -55,6 +65,7 @@ meta:
   bosh:
     stemcell:
       cpi: "warden-boshlite"
+    deployment-clustering:   (( concat meta.name "-testflight-clustering" ))
 
   test-errands: smoke-tests
 
@@ -65,3 +76,38 @@ meta:
     channel:       (( concat "#" meta.name "-boshrelease" ))
     blob_success:  '(( concat ": New version of  was detected, and updated in master. <" meta.url "/teams//pipelines/| Cut a new release?>" ))'
     blob_failure:  '(( concat ": :airplane_arriving: <" meta.url "/teams//pipelines//jobs//builds/| Failed to update the blob for >" ))'
+
+jobs:
+  - name: testflight
+    plan:
+    - name: main
+      do:
+      - (( append ))
+
+      - name: testflight-clustering
+        task: testflight
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: (( grab meta.image.name ))
+              tag:        (( grab meta.image.tag ))
+          inputs:
+            - { name: git }
+          run:
+            path: ./git/ci/scripts/testflight
+            args: []
+          params:
+            REPO_ROOT:            git
+            BOSH_ENVIRONMENT:     (( grab meta.bosh.target ))
+            BOSH_CA_CERT:         (( grab meta.bosh.cacert ))
+            BOSH_CLIENT:          (( grab meta.bosh.username ))
+            BOSH_CLIENT_SECRET:   (( grab meta.bosh.password ))
+            BOSH_DEPLOYMENT:      (( grab meta.bosh.deployment-clustering ))
+            TEST_ERRANDS:         (( grab meta.test-errands || meta.test-errand || ~ ))
+            AWS_ACCESS_KEY:       (( grab meta.aws.access_key ))
+            AWS_SECRET_KEY:       (( grab meta.aws.secret_key ))
+            MANIFEST_PATH:        (( grab meta.manifest.path ))
+            MANIFEST_VARS:        (( grab meta.manifest.vars-clustering ))
+            MANIFEST_OP_PATHS:    (( concat meta.manifest.operator_file_paths " " meta.manifest.operator_file_paths-clustering ))

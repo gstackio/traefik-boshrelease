@@ -27,9 +27,10 @@
 
 - path: /update?/serial
   type: replace
-  # NOTE: in production it's safer to adopt 'serial: true'. But for tests,
-  # it's faster to use 'serial: false'.
-  value: false
+  # NOTE: in production and for initial deployments, it's safer to always
+  # stick 'serial: true'. But for tests, and after an initial successful
+  # deployment, it's faster to use 'serial: false'.
+  value: true
 
 - path: /instance_groups/name=traefik:before
   type: replace

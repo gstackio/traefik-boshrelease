@@ -6,6 +6,7 @@ description: This job runs a Traefik reverse-proxy.
 templates:
   bin/traefik_ctl: bin/traefik_ctl
   bin/bpm-prestart: bin/bpm-prestart
+  bin/dns/healthy: bin/dns/healthy
   bpm.yml: config/bpm.yml
   conf/traefik.toml: conf/traefik.toml
   conf/rules.toml: conf/rules.toml
@@ -13,6 +14,7 @@ templates:
   tls/traefik-default.key: tls/traefik-default.key
   tls/web-backend.crt: tls/web-backend.crt
   tls/web-backend.key: tls/web-backend.key
+  tls/api-entrypoint-ca.crt: tls/api-entrypoint-ca.crt
   tls/api-entrypoint.crt: tls/api-entrypoint.crt
   tls/api-entrypoint.key: tls/api-entrypoint.key
   tls/consul-ca-bundle.crt: tls/consul-ca-bundle.crt

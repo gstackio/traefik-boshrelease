@@ -1,0 +1,18 @@
+#!bin/bash
+<%
+    require "shellwords"
+    def esc(x)
+        Shellwords.shellescape(x)
+    end
+
+    if p('traefik.api.enabled')
+
+        api_tls_port = p("traefik.api.tls.port")
+-%>
+
+exec curl --silent --fail --show-error \
+    --cacert "/var/vcap/jobs/traefik/tls/api-entrypoint-ca.crt" \
+    --url <%= esc("https://127.0.0.1:#{api_tls_port}") %>/ping
+<%
+    end
+-%>

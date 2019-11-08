@@ -9,22 +9,22 @@ pushd "${RELEASE_DIR}" > /dev/null
 team="main"
 pipeline="traefik-boshrelease"
 
-credhub set -n "/concourse/${team}/git-commit-email"    -t value -v "$(bosh int ci/pipeline/secrets.yml --path /git_user_email)"
-credhub set -n "/concourse/${team}/git-commit-name"     -t value -v "$(bosh int ci/pipeline/config.yml  --path /git_user_name)"
-credhub set -n "/concourse/${team}/aws-access-key"      -t value -v "$(bosh int config/private.yml      --path /blobstore/options/access_key_id)"
-credhub set -n "/concourse/${team}/aws-secret-key"      -t value -v "$(bosh int config/private.yml      --path /blobstore/options/secret_access_key)"
+credhub set -n "/concourse/${team}/git-commit-email"    -t value -v "$(bosh int ci/secrets.yml     --path /git_user_email)"
+credhub set -n "/concourse/${team}/git-commit-name"     -t value -v "$(bosh int ci/config.yml      --path /git_user_name)"
+credhub set -n "/concourse/${team}/aws-access-key"      -t value -v "$(bosh int config/private.yml --path /blobstore/options/access_key_id)"
+credhub set -n "/concourse/${team}/aws-secret-key"      -t value -v "$(bosh int config/private.yml --path /blobstore/options/secret_access_key)"
 
-credhub set -n "/concourse/${team}/slack-username" -t value -v "gk-concourse-ninja"
-credhub set -n "/concourse/${team}/slack-icon-url" -t value -v "https://cl.ly/2F421Y300u07/concourse-logo-blue-transparent.png"
-credhub set -n "/concourse/${team}/slack-webhook"  -t value -v "$(bosh int ci/pipeline/secrets.yml --path /slack_webhook)"
+credhub set -n "/concourse/${team}/slack-username"            -t value -v "gk-concourse-ninja"
+credhub set -n "/concourse/${team}/slack-icon-url"            -t value -v "https://cl.ly/2F421Y300u07/concourse-logo-blue-transparent.png"
+credhub set -n "/concourse/${team}/${pipeline}/slack-webhook" -t value -v "$(bosh int ci/secrets.yml --path /slack_webhook)"
 
-credhub set -n "/concourse/${team}/github-access-token" -t value -v "$(bosh int ci/pipeline/secrets.yml --path /github_access_token)"
-credhub set -n "/concourse/${team}/github-private-key"  -t value -v "$(bosh int ci/pipeline/secrets.yml --path /github_private_key)"
+credhub set -n "/concourse/${team}/github-access-token" -t value -v "$(bosh int ci/secrets.yml --path /github_access_token)"
+credhub set -n "/concourse/${team}/github-private-key"  -t value -v "$(bosh int ci/secrets.yml --path /github_private_key)"
 
-credhub set -n "/concourse/${team}/bosh-lite-environment"   -t value -v "$(bosh int ci/pipeline/secrets.yml --path /bosh-lite-environment)"
-credhub set -n "/concourse/${team}/bosh-lite-ca-cert"       -t value -v "$(bosh int ci/pipeline/secrets.yml --path /bosh-lite-ca-cert)"
-credhub set -n "/concourse/${team}/bosh-lite-client"        -t value -v "$(bosh int ci/pipeline/secrets.yml --path /bosh-lite-client)"
-credhub set -n "/concourse/${team}/bosh-lite-client-secret" -t value -v "$(bosh int ci/pipeline/secrets.yml --path /bosh-lite-client-secret)"
+credhub set -n "/concourse/${team}/bosh-lite-environment"   -t value -v "$(bosh int ci/secrets.yml --path /bosh-lite-environment)"
+credhub set -n "/concourse/${team}/bosh-lite-ca-cert"       -t value -v "$(bosh int ci/secrets.yml --path /bosh-lite-ca-cert)"
+credhub set -n "/concourse/${team}/bosh-lite-client"        -t value -v "$(bosh int ci/secrets.yml --path /bosh-lite-client)"
+credhub set -n "/concourse/${team}/bosh-lite-client-secret" -t value -v "$(bosh int ci/secrets.yml --path /bosh-lite-client-secret)"
 
 # To delete all:
 #

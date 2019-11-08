@@ -1,0 +1,12 @@
+---
+
+- path: /releases/name=gk-consul?
+  type: replace
+  value:
+    name: gk-consul
+    sha1: be10ef2589f83347d7189324da68f1b8930c27be
+    stemcell:
+      os: ubuntu-xenial
+      version: "621.5"
+    url: https://s3.eu-west-3.amazonaws.com/gk-consul-boshrelease/compiled-releases/gk-consul/gk-consul-1.0.0-ubuntu-xenial-621.5-20191108-201801-262567644-20191108201803.tgz
+    version: 1.0.0

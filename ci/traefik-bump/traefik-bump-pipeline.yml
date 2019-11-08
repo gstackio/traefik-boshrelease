@@ -119,30 +119,6 @@ jobs:
         params:
           file: bump-info/keyval.properties
 
-      - task: deploy
-        image: kinja-image
-        config:
-          platform: linux
-          run:
-            path: /bin/bash
-            args:
-              - -exc
-              - |
-                exit 0 # TODO: implement deploy
-
-      - task: test
-        image: kinja-image
-        config:
-          platform: linux
-          inputs:
-            - name: traefik-boshrelease-bumped
-          run:
-            path: /bin/bash
-            args:
-              - -exc
-              - |
-                exit 0 # TODO: implement tests
-
       - task: upload-blobs
         params:
           S3_ACCESS_KEY_ID: ((s3_access_key_id))
@@ -257,8 +233,8 @@ jobs:
                 pr_desc+="\\nI noticed that the new Traefik v${latest_traefik_version} is out,"
                 pr_desc+=" so I suggest we update this BOSH Release with the latest binary available."
                 pr_desc+="\\n"
-                pr_desc+="\\nHere in this PR, I've pulled that new binary in, and the tests are passing properly."
-                pr_desc+=" So I uploaded the blob to the release blobstore, and here is the result."
+                pr_desc+="\\nHere in this PR, I've pulled that new binary in."
+                pr_desc+=" I uploaded the blob to the release blobstore, and here is the result."
                 pr_desc+="\\n"
                 pr_desc+="\\nLet's give it a shot, shall we?"
                 pr_desc+="\\n"

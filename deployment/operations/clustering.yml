@@ -25,12 +25,21 @@
     #       succesfully transitioning to Consul KV store.
     disable_acme_local_storage_file: false
 
-- path: /update?/serial
+- path: /update
   type: replace
-  # NOTE: in production and for initial deployments, it's safer to always
-  # stick 'serial: true'. But for tests, and after an initial successful
-  # deployment, it's faster to use 'serial: false'.
-  value: true
+  value:
+    # NOTE: in production and for initial deployments, it's safer to always
+    # stick 'serial: true'. But for tests, and after an initial successful
+    # deployment, it's faster to use 'serial: false'.
+    serial: true
+
+    # Here we raise canary watch time and update watch time from 5s to 60s,
+    # and this fits for both Traefik and Consul.
+    canaries: 1
+    canary_watch_time: 1000-60000
+
+    max_in_flight: 1
+    update_watch_time: 1000-60000
 
 - path: /instance_groups/name=traefik:before
   type: replace
@@ -60,11 +69,6 @@
     vm_type: default
     networks:
       - name: ((network_name))
-    update: &consul_update_properties
-      canaries: 1
-      canary_watch_time: 1000-60000
-      max_in_flight: 1
-      update_watch_time: 1000-60000
 
 - path: /instance_groups/name=traefik:before
   type: replace
@@ -96,7 +100,6 @@
     vm_type: default
     networks:
       - name: ((network_name))
-    update: *consul_update_properties
 
 - path: /variables/name=consul_encrypt_key?
   type: replace

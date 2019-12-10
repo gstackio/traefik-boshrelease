@@ -28,13 +28,6 @@ resources:
       branch: master
       private_key: ((github_private_key))
 
-  # - name: traefik-boshrelease-develop
-  #   type: git
-  #   source:
-  #     uri: ((traefik_release_git_uri))
-  #     branch: develop
-  #     private_key: ((github_private_key))
-
   - name: bump-info
     type: keyval
 
@@ -42,14 +35,13 @@ jobs:
   - name: detect
     plan:
       - in_parallel:
-        - get: traefik-gh-release
-          trigger: true
-          params: { globs: [ "*_linux-amd64" ] }
-        - get: traefik-boshrelease-master
-        - get: kinja-image
+          - get: traefik-gh-release
+            trigger: true
+            params: { globs: [ "*_linux-amd64" ] }
+          - get: traefik-boshrelease-master
+          - get: kinja-image
 
       - task: add-blob
-        # file: traefik-boshrelease/ci/tasks/add-blob/task.yml
         input_mapping:
           traefik-boshrelease: traefik-boshrelease-master
         image: kinja-image
@@ -83,10 +75,6 @@ jobs:
                     git pull
 
                     git checkout -b "${branch_name}"
-                    # if ! git branch "develop"; then
-                    #     git checkout "develop"
-                    #     git pull
-                    # fi
 
                     bosh blobs
 
@@ -198,11 +186,6 @@ jobs:
                     ssh-keyscan -t rsa "github.com" 2> /dev/null >> "${HOME}/.ssh/known_hosts"
                     git push --set-upstream origin "${branch_name}"
                 popd > /dev/null
-
-      # - put: traefik-boshrelease
-      #   params:
-      #     repository: traefik-boshrelease-blobs-uploaded
-      #     rebase: true
 
       - task: submit-pr
         params:

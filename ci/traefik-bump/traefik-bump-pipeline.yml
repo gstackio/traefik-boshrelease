@@ -21,6 +21,15 @@ resources:
       tag_filter: v(1\.\d+\.\d+)
       access_token: ((github_access_token))
 
+  - name: gk-consul-boshrelease-gh-release
+    type: github-release
+    source:
+      owner: gstackio
+      repository: gk-consul-boshrelease
+      pre_release: false
+      tag_filter: v(\d+\.\d+\.\d+)
+      access_token: ((github_access_token))
+
   - name: traefik-boshrelease-master
     type: git
     source:
@@ -32,7 +41,10 @@ resources:
     type: keyval
 
 jobs:
-  - name: detect
+  - name: detect-traefik
+    old_name: detect
+    serial: true
+    serial_groups: [ detect ]
     plan:
       - in_parallel:
           - get: traefik-gh-release
@@ -92,8 +104,12 @@ jobs:
                     git config --global "user.name" "((git_user_name))"
                     git config --global "user.email" "((git_user_email))"
 
-                    git add .
-                    git commit -m "Bump Traefik binary to version ${latest_traefik_version}"
+                    if [[ -z "$(git status --porcelain)" ]]; then
+                        echo "INFO: nothing to commit. Skipping."
+                    else
+                        git add .
+                        git commit -m "Bump Traefik binary to version ${latest_traefik_version}"
+                    fi
                 popd > /dev/null
 
 
@@ -239,6 +255,197 @@ jobs:
                 echo "Creating pull request: POST /repos/${GH_OWNER}/${GH_REPO}/pulls"
                 # See also: https://developer.github.com/v3/
                 curl --silent --fail \
+                    --header "Accept: application/vnd.github.v3+json" \
+                    --header "Authorization: token ${GH_ACCESS_TOKEN}" \
+                    --request POST \
+                    --url "https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/pulls" \
+                    --data-raw "${pr_data}"
+                exit 0
+
+  - name: detect-consul
+    serial: true
+    serial_groups: [ detect ]
+    plan:
+      - in_parallel:
+          - get: gk-consul-boshrelease-gh-release
+            trigger: true
+          - get: traefik-boshrelease-master
+          - get: kinja-image
+
+      - task: add-blob
+        input_mapping:
+          traefik-boshrelease: traefik-boshrelease-master
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: gk-consul-boshrelease-gh-release
+            - name: traefik-boshrelease
+          outputs:
+            - name: traefik-boshrelease-bumped
+            - name: bump-info
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                find gk-consul-boshrelease-gh-release -ls
+
+                echo tag:        $(< gk-consul-boshrelease-gh-release/tag)
+                echo version:    $(< gk-consul-boshrelease-gh-release/version)
+                echo commit_sha: $(< gk-consul-boshrelease-gh-release/commit_sha)
+
+                latest_consul_release_version=$(< gk-consul-boshrelease-gh-release/version)
+
+                git clone "traefik-boshrelease" "traefik-boshrelease-bumped"
+                branch_name="bump-consul-${latest_consul_release_version}"
+
+                git clone https://github.com/gstackio/gk-consul-boshrelease.git
+                pushd gk-consul-boshrelease > /dev/null
+                    git checkout "v${latest_consul_release_version}"
+                popd > /dev/null
+
+                pushd "traefik-boshrelease-bumped" > /dev/null
+                    git checkout "master"
+                    git pull
+
+                    git checkout -b "${branch_name}"
+
+                    consul_release_json=$(
+                        bosh interpolate "../gk-consul-boshrelease/deploy/gk-consul.yml" \
+                            --path "/releases/name=gk-consul" \
+                        | spruce json "/dev/stdin" \
+                        | jq --compact-output '{
+                            "name": .name, "version": .version,
+                            "url": .url, "sha1": .sha1
+                          }')
+
+                    opsfile_path=deployment/operations/clustering.yml
+                    release_updated=$(bosh interpolate /dev/stdin <<YAML
+                - path: /releases/name=gk-consul?
+                  type: replace
+                  value: ${consul_release_json}
+                YAML
+                )
+                    releases_line_number=$(awk '/^- path: \/releases\/name=gk-consul\?$/{ print NR; exit }' "${opsfile_path}")
+                    opsfile_head=$(head -n $((${releases_line_number} - 1)) "${opsfile_path}")
+                    cat > "${opsfile_path}" <<YAML
+                ${opsfile_head}
+
+                ${release_updated}
+                YAML
+
+                    git config --global "color.ui" "always"
+                    git status
+                    git diff | cat
+
+                    git config --global "user.name" "((git_user_name))"
+                    git config --global "user.email" "((git_user_email))"
+
+                    git add .
+                    git commit -m "Bump Consul BOSH release to version ${latest_consul_release_version}"
+                popd > /dev/null
+
+
+                # Write properties to the keyval output resource
+
+                mkdir -p bump-info
+                echo "latest_consul_release_version=${latest_consul_release_version}" >> bump-info/keyval.properties
+                echo "branch_name=${branch_name}"                                     >> bump-info/keyval.properties
+
+      - put: bump-info
+        params:
+          file: bump-info/keyval.properties
+
+      - task: git-push
+        input_mapping:
+          repo: traefik-boshrelease-bumped
+        params:
+          GIT_URI: ((traefik_release_git_uri))
+          GITHUB_PRIVATE_KEY: ((github_private_key))
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: bump-info
+            - name: repo
+          params:
+            GIT_URI:
+            GITHUB_PRIVATE_KEY:
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                mkdir -p "${HOME}/.ssh"
+                chmod 700 "${HOME}/.ssh"
+
+                touch "${HOME}/.ssh/id_rsa"
+                chmod 600 "${HOME}/.ssh/id_rsa"
+                cat <<< "${GITHUB_PRIVATE_KEY}" > "${HOME}/.ssh/id_rsa"
+
+                grep -vE "^(UPDATED|UUID)=" "bump-info/keyval.properties" \
+                    | sed -r -e 's/"/\"/g; s/=(.*)$/="\1"/' \
+                    > keyval.inc.bash
+                source "keyval.inc.bash"
+
+                pushd "repo" > /dev/null
+                    git remote set-url origin "${GIT_URI}"
+                    ssh-keyscan -t rsa "github.com" 2> /dev/null >> "${HOME}/.ssh/known_hosts"
+                    git push --set-upstream origin "${branch_name}"
+                popd > /dev/null
+
+      - task: submit-pr
+        params:
+          GH_ACCESS_TOKEN: ((github_access_token))
+          GH_OWNER: gstackio
+          GH_REPO: traefik-boshrelease
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: bump-info
+          params:
+            GH_ACCESS_TOKEN:
+            GH_OWNER:
+            GH_REPO:
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                grep -vE "^(UPDATED|UUID)=" "bump-info/keyval.properties" \
+                    | sed -r -e 's/"/\"/g; s/=(.*)$/="\1"/' \
+                    > keyval.inc.bash
+                source "keyval.inc.bash"
+
+                pr_desc="Hi there!"
+                pr_desc+="\\n"
+                pr_desc+="\\nI noticed that the new Consul v${latest_consul_release_version} is out,"
+                pr_desc+=" so I suggest we use it in the default deployment manifest for this BOSH Release."
+                pr_desc+="\\n"
+                pr_desc+="\\nHere in this PR, I've updated the deployment manifest."
+                pr_desc+="\\n"
+                pr_desc+="\\nLet's give it a shot, shall we?"
+                pr_desc+="\\n"
+                pr_desc+="\\nBest"
+
+                # See also: https://developer.github.com/v3/pulls/#create-a-pull-request
+                pr_data=$(jq -n \
+                    --arg title "Bump Consul to version ${latest_consul_release_version}" \
+                    --arg body "$(echo -e "${pr_desc}")" \
+                    --arg head "${branch_name}" \
+                    '{
+                        "base": "master",
+                        "title": $title,
+                        "body": $body,
+                        "head": $head,
+                        "maintainer_can_modify": true
+                    }')
+
+                echo "Creating pull request: POST /repos/${GH_OWNER}/${GH_REPO}/pulls"
+                # See also: https://developer.github.com/v3/
+                curl --silent --fail --show-error \
                     --header "Accept: application/vnd.github.v3+json" \
                     --header "Authorization: token ${GH_ACCESS_TOKEN}" \
                     --request POST \

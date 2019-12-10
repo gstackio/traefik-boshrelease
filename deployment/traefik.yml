@@ -35,6 +35,7 @@ variables:
     options:
       is_ca: true
       common_name: traefikCA
+    update_mode: converge
 
   - name: traefik_tls
     type: certificate
@@ -44,6 +45,7 @@ variables:
       alternative_names:
         - ((traefik_domain))
         - "*.((traefik_domain))"
+    update_mode: converge
 
 features:
   use_dns_addresses: true

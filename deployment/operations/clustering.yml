@@ -119,6 +119,7 @@
     options:
       is_ca: true
       common_name: Consul CA
+    update_mode: converge
 
 - path: /variables/name=consul_agent_tls?
   type: replace

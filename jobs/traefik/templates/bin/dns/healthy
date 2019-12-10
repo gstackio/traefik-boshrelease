@@ -12,7 +12,7 @@
 
 exec curl --silent --fail --show-error \
     --cacert "/var/vcap/jobs/traefik/tls/api-entrypoint-ca.crt" \
-    --url <%= esc("https://127.0.0.1:#{api_tls_port}") %>/ping
+    --url <%= esc("https://127.0.0.1:#{api_tls_port}/ping") %>
 <%
     end
 -%>

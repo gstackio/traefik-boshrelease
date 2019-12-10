@@ -1,13 +1,5 @@
 ---
 
-- path: /releases/name=gk-consul?
-  type: replace
-  value:
-    name: gk-consul
-    version: 1.0.0
-    url: https://github.com/gstackio/gk-consul-boshrelease/releases/download/v1.0.0/gk-consul-1.0.0.tgz
-    sha1: 08082c322dec51ffbb995f1d5ea54fdade55dc7b
-
 - path: /instance_groups/name=traefik/instances
   type: replace
   value: 3
@@ -170,3 +162,11 @@
     consumes:
       alternative_name: { from: traefik-address }
     update_mode: converge
+
+- path: /releases/name=gk-consul?
+  type: replace
+  value:
+    name: gk-consul
+    version: 1.0.0
+    url: https://github.com/gstackio/gk-consul-boshrelease/releases/download/v1.0.0/gk-consul-1.0.0.tgz
+    sha1: 08082c322dec51ffbb995f1d5ea54fdade55dc7b

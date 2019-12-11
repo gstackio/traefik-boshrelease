@@ -421,7 +421,7 @@ jobs:
 
                 pr_desc="Hi there!"
                 pr_desc+="\\n"
-                pr_desc+="\\nI noticed that the new Consul v${latest_consul_release_version} is out,"
+                pr_desc+="\\nI noticed that the new Consul release v${latest_consul_release_version} is out,"
                 pr_desc+=" so I suggest we use it in the default deployment manifest for this BOSH Release."
                 pr_desc+="\\n"
                 pr_desc+="\\nHere in this PR, I've updated the deployment manifest."

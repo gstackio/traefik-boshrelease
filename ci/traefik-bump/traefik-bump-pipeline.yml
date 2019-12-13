@@ -298,7 +298,7 @@ jobs:
                 latest_consul_release_version=$(< gk-consul-boshrelease-gh-release/version)
 
                 git clone "traefik-boshrelease" "traefik-boshrelease-bumped"
-                branch_name="bump-consul-${latest_consul_release_version}"
+                branch_name="master"
 
                 git clone https://github.com/gstackio/gk-consul-boshrelease.git
                 pushd gk-consul-boshrelease > /dev/null
@@ -394,61 +394,3 @@ jobs:
                     ssh-keyscan -t rsa "github.com" 2> /dev/null >> "${HOME}/.ssh/known_hosts"
                     git push --set-upstream origin "${branch_name}"
                 popd > /dev/null
-
-      - task: submit-pr
-        params:
-          GH_ACCESS_TOKEN: ((github_access_token))
-          GH_OWNER: gstackio
-          GH_REPO: traefik-boshrelease
-        image: kinja-image
-        config:
-          platform: linux
-          inputs:
-            - name: bump-info
-          params:
-            GH_ACCESS_TOKEN:
-            GH_OWNER:
-            GH_REPO:
-          run:
-            path: /bin/bash
-            args:
-              - -exc
-              - |
-                grep -vE "^(UPDATED|UUID)=" "bump-info/keyval.properties" \
-                    | sed -r -e 's/"/\"/g; s/=(.*)$/="\1"/' \
-                    > keyval.inc.bash
-                source "keyval.inc.bash"
-
-                pr_desc="Hi there!"
-                pr_desc+="\\n"
-                pr_desc+="\\nI noticed that the new Consul release v${latest_consul_release_version} is out,"
-                pr_desc+=" so I suggest we use it in the default deployment manifest for this BOSH Release."
-                pr_desc+="\\n"
-                pr_desc+="\\nHere in this PR, I've updated the deployment manifest."
-                pr_desc+="\\n"
-                pr_desc+="\\nLet's give it a shot, shall we?"
-                pr_desc+="\\n"
-                pr_desc+="\\nBest"
-
-                # See also: https://developer.github.com/v3/pulls/#create-a-pull-request
-                pr_data=$(jq -n \
-                    --arg title "Bump Consul to version ${latest_consul_release_version}" \
-                    --arg body "$(echo -e "${pr_desc}")" \
-                    --arg head "${branch_name}" \
-                    '{
-                        "base": "master",
-                        "title": $title,
-                        "body": $body,
-                        "head": $head,
-                        "maintainer_can_modify": true
-                    }')
-
-                echo "Creating pull request: POST /repos/${GH_OWNER}/${GH_REPO}/pulls"
-                # See also: https://developer.github.com/v3/
-                curl --silent --fail --show-error \
-                    --header "Accept: application/vnd.github.v3+json" \
-                    --header "Authorization: token ${GH_ACCESS_TOKEN}" \
-                    --request POST \
-                    --url "https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/pulls" \
-                    --data-raw "${pr_data}"
-                exit 0

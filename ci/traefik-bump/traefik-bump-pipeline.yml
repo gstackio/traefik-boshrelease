@@ -30,6 +30,11 @@ resources:
       tag_filter: v(\d+\.\d+\.\d+)
       access_token: ((github_access_token))
 
+  - name: bpm-bosh-io-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/bpm-release
+
   - name: traefik-boshrelease-master
     type: git
     source:
@@ -42,7 +47,6 @@ resources:
 
 jobs:
   - name: detect-traefik
-    old_name: detect
     serial: true
     serial_groups: [ detect ]
     plan:
@@ -272,7 +276,7 @@ jobs:
           - get: traefik-boshrelease-master
           - get: kinja-image
 
-      - task: add-blob
+      - task: bump-consul
         input_mapping:
           traefik-boshrelease: traefik-boshrelease-master
         image: kinja-image
@@ -352,6 +356,133 @@ jobs:
                 mkdir -p bump-info
                 echo "latest_consul_release_version=${latest_consul_release_version}" >> bump-info/keyval.properties
                 echo "branch_name=${branch_name}"                                     >> bump-info/keyval.properties
+
+      - put: bump-info
+        params:
+          file: bump-info/keyval.properties
+
+      - task: git-push
+        input_mapping:
+          repo: traefik-boshrelease-bumped
+        params:
+          GIT_URI: ((traefik_release_git_uri))
+          GITHUB_PRIVATE_KEY: ((github_private_key))
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: bump-info
+            - name: repo
+          params:
+            GIT_URI:
+            GITHUB_PRIVATE_KEY:
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                mkdir -p "${HOME}/.ssh"
+                chmod 700 "${HOME}/.ssh"
+
+                touch "${HOME}/.ssh/id_rsa"
+                chmod 600 "${HOME}/.ssh/id_rsa"
+                cat <<< "${GITHUB_PRIVATE_KEY}" > "${HOME}/.ssh/id_rsa"
+
+                grep -vE "^(UPDATED|UUID)=" "bump-info/keyval.properties" \
+                    | sed -r -e 's/"/\"/g; s/=(.*)$/="\1"/' \
+                    > keyval.inc.bash
+                source "keyval.inc.bash"
+
+                pushd "repo" > /dev/null
+                    git remote set-url origin "${GIT_URI}"
+                    ssh-keyscan -t rsa "github.com" 2> /dev/null >> "${HOME}/.ssh/known_hosts"
+                    git push --set-upstream origin "${branch_name}"
+                popd > /dev/null
+
+  - name: detect-bpm
+    serial: true
+    serial_groups: [ detect ]
+    plan:
+      - in_parallel:
+          - get: bpm-bosh-io-release
+            trigger: true
+            params:
+              tarball: false
+          - get: traefik-boshrelease-master
+          - get: kinja-image
+
+      - task: bump-bpm
+        input_mapping:
+          traefik-boshrelease: traefik-boshrelease-master
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: bpm-bosh-io-release
+            - name: traefik-boshrelease
+          outputs:
+            - name: traefik-boshrelease-bumped
+            - name: bump-info
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                find bpm-bosh-io-release -ls
+
+                echo version: $(< bpm-bosh-io-release/version)
+                echo url:     $(< bpm-bosh-io-release/url)
+                echo sha1:    $(< bpm-bosh-io-release/sha1)
+
+                latest_bpm_release_version=$(< bpm-bosh-io-release/version)
+                url=$(< bpm-bosh-io-release/url)
+                sha1=$(< bpm-bosh-io-release/sha1)
+
+                git clone "traefik-boshrelease" "traefik-boshrelease-bumped"
+                branch_name="master"
+
+                pushd "traefik-boshrelease-bumped" > /dev/null
+                    git checkout "${branch_name}"
+                    git pull
+
+                    manifest_path=deployment/traefik.yml
+                    releases_updated=$(spruce merge <<YAML
+                releases: $(spruce json "${manifest_path}" \
+                    | jq --arg name "bpm" --arg version "${latest_bpm_release_version}" \
+                        --arg url "${url}" --arg sha1 "${sha1}" \
+                        '.releases | map(
+                            if .name == $name
+                            then . + {"version":$version,"url":$url,"sha1":$sha1}
+                            else .
+                            end)'
+                )
+                YAML
+                )
+                    releases_line_number=$(awk '/^releases:/{ print NR; exit }' "${manifest_path}")
+                    opsfile_head=$(head -n $((${releases_line_number} - 1)) "${manifest_path}")
+                    cat > "${manifest_path}" <<YAML
+                ${opsfile_head}
+
+                ${releases_updated}
+                YAML
+
+                    git config --global "color.ui" "always"
+                    git status
+                    git diff | cat
+
+                    git config --global "user.name" "((git_user_name))"
+                    git config --global "user.email" "((git_user_email))"
+
+                    git add .
+                    git commit -m "Bump BPM to version ${latest_bpm_release_version}"
+                popd > /dev/null
+
+
+                # Write properties to the keyval output resource
+
+                mkdir -p bump-info
+                echo "latest_bpm_release_version=${latest_bpm_release_version}" >> bump-info/keyval.properties
+                echo "branch_name=${branch_name}"                               >> bump-info/keyval.properties
 
       - put: bump-info
         params:

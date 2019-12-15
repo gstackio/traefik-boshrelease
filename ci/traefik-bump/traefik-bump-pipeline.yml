@@ -30,17 +30,17 @@ resources:
       tag_filter: v(\d+\.\d+\.\d+)
       access_token: ((github-access-token))
 
-  - name: bpm-bosh-io-release
-    type: bosh-io-release
-    source:
-      repository: cloudfoundry/bpm-release
-
   - name: gk-automation
     type: git
     source:
       uri: git@github.com:gstackio/gk-automation.git
       branch: master
       private_key: ((github-private-key))
+
+  - name: bpm-bosh-io-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/bpm-release
 
   - name: traefik-boshrelease-master
     type: git
@@ -177,42 +177,14 @@ jobs:
                 popd > /dev/null
 
       - task: git-push
+        image: kinja-image
         input_mapping:
+          branch-info: bump-info
           repo: traefik-boshrelease-blobs-uploaded
         params:
           GIT_URI: ((traefik_release_git_uri))
           GITHUB_PRIVATE_KEY: ((github-private-key))
-        image: kinja-image
-        config:
-          platform: linux
-          inputs:
-            - name: bump-info
-            - name: repo
-          params:
-            GIT_URI:
-            GITHUB_PRIVATE_KEY:
-          run:
-            path: /bin/bash
-            args:
-              - -exc
-              - |
-                mkdir -p "${HOME}/.ssh"
-                chmod 700 "${HOME}/.ssh"
-
-                touch "${HOME}/.ssh/id_rsa"
-                chmod 600 "${HOME}/.ssh/id_rsa"
-                cat <<< "${GITHUB_PRIVATE_KEY}" > "${HOME}/.ssh/id_rsa"
-
-                grep -vE "^(UPDATED|UUID)=" "bump-info/keyval.properties" \
-                    | sed -r -e 's/"/\"/g; s/=(.*)$/="\1"/' \
-                    > keyval.inc.bash
-                source "keyval.inc.bash"
-
-                pushd "repo" > /dev/null
-                    git remote set-url origin "${GIT_URI}"
-                    ssh-keyscan -t rsa "github.com" 2> /dev/null >> "${HOME}/.ssh/known_hosts"
-                    git push --set-upstream origin "${branch_name}"
-                popd > /dev/null
+        file: gk-automation/boshrelease/git-push.yml
 
       - task: submit-pr
         params:

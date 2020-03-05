@@ -10,14 +10,15 @@
     enabled: true
     cert: ((web_backend_tls))
 
-- path: /variables?/name=traefikCA
+- path: /variables?/name=traefik_ca
   type: replace
   value:
-    name: traefikCA
+    name: traefik_ca
     type: certificate
     options:
       is_ca: true
-      common_name: traefikCA
+      common_name: Traefik CA
+    update_mode: converge
 
 - path: /variables?/name=web_backend_tls
   type: replace
@@ -25,5 +26,6 @@
     name: web_backend_tls
     type: certificate
     options:
-      ca: traefikCA
+      ca: traefik_ca
       common_name: web_backend_tls
+    update_mode: converge

@@ -5,10 +5,10 @@ deployment of a Træfik reverse-proxy, that can be deployed in
 [BOSH-Lite](https://bosh.io/docs/bosh-lite.html).
 
 It enables a TLS endpoint with a custom certificate named `traefik_tls`,
-signed by a custom Certificate Authority named `traefikCA`. When you need your
-Certificate Authority, or your certificate to be used, upload it in CredHub
-with the correct `//<director-name>/<deployment-name>/<variable-name>` path or
-put it in your `--vars-store` file prior to deploying.
+signed by a custom Certificate Authority named `traefik_ca`. When you need
+your Certificate Authority, or your certificate to be used, upload it in
+CredHub with the correct `//<director-name>/<deployment-name>/<variable-name>`
+path or put it in your `--vars-store` file prior to deploying.
 
 
 ## Cloud config

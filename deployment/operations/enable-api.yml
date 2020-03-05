@@ -17,14 +17,15 @@
     name: api_password
     type: password
 
-- path: /variables?/name=traefikCA
+- path: /variables?/name=traefik_ca
   type: replace
   value:
-    name: traefikCA
+    name: traefik_ca
     type: certificate
     options:
       is_ca: true
-      common_name: traefikCA
+      common_name: Traefik CA
+    update_mode: converge
 
 - path: /variables?/name=api_tls
   type: replace
@@ -32,7 +33,7 @@
     name: api_tls
     type: certificate
     options:
-      ca: traefikCA
+      ca: traefik_ca
       common_name: traefik.((network_name)).((deployment_name)).bosh
       alternative_names:
         - "*.traefik.((network_name)).((deployment_name)).bosh"

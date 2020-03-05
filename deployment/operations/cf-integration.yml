@@ -62,7 +62,7 @@
             # Foundry Gorouters.
             pem = true
 
-            # See <https://docs.traefik.io/configuration/commons/#pass-tls-client-cert>
+            # See <https://docs.traefik.io/v1.7/configuration/commons/#pass-tls-client-cert>
             # for more options.
 
           [frontends.cf-tls-frontend.routes]

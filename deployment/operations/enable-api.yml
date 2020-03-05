@@ -36,5 +36,6 @@
       ca: traefik_ca
       common_name: traefik.((network_name)).((deployment_name)).bosh
       alternative_names:
+        - traefik.((network_name)).((deployment_name)).bosh
         - "*.traefik.((network_name)).((deployment_name)).bosh"
     update_mode: converge

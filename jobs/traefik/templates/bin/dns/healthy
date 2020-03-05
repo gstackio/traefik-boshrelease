@@ -8,10 +8,17 @@
     if p('traefik.api.enabled')
 
         api_tls_port = p("traefik.api.tls.port")
+
+        # Notice: we finally give up with having this script detect SSL certs
+        # issues and enable the '--insecure' flag below. Indeed, we currently
+        # have no config property for specifying the hostname on which the API is
+        # exposed, which actually is the CN property (or alternate names) of its
+        # TLS certificate. We don't want "127.0.0.1" to become a mandatory
+        # alternative name in this TLS certificate, either.
 -%>
 
 exec curl --silent --fail --show-error \
-    --cacert "/var/vcap/jobs/traefik/tls/api-entrypoint-ca.crt" \
+    --insecure \
     --url <%= esc("https://127.0.0.1:#{api_tls_port}/ping") %>
 <%
     end

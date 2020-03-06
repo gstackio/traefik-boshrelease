@@ -97,7 +97,9 @@ jobs:
                     git checkout "master"
                     git pull
 
-                    git checkout -b "${branch_name}"
+                    if [[ ${branch_name} != "master" ]]; then
+                        git checkout -b "${branch_name}"
+                    fi
 
                     bosh blobs
 
@@ -293,7 +295,9 @@ jobs:
                     git checkout "master"
                     git pull
 
-                    git checkout -b "${branch_name}"
+                    if [[ ${branch_name} != "master" ]]; then
+                        git checkout -b "${branch_name}"
+                    fi
 
                     consul_release_json=$(
                         bosh interpolate "../gk-consul-boshrelease/deploy/gk-consul.yml" \

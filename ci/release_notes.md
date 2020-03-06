@@ -1,10 +1,12 @@
 ### Improvements
 
-- Bump Træfik to the latest version [1.7.21](https://github.com/containous/traefik/releases/tag/v1.7.21)
+- Bump Træfik to the latest version [1.7.21](https://github.com/containous/traefik/releases/tag/v1.7.21).
+
+- Bump the [Consul release](https://github.com/gstackio/gk-consul-boshrelease) to v1.2.0 in the `clustering.yml` ops file.
 
 - Bump BPM to v1.1.7 in the `traefik.yml` deployment manifest.
 
-- Fix the broken DNS healthcheck script
+- Fix the broken DNS healthcheck script.
 
 
 ### Breaking changes

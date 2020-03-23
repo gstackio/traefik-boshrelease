@@ -73,6 +73,6 @@ releases:
   url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.12.0-ubuntu-xenial-621.59-20200306-164943-023591201-20200306164944.tgz
   version: 1.12.0
 - name: bpm
-  sha1: e7d474c3a205fa4438ea5a60d3b59479939163aa
-  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.7
-  version: 1.1.7
+  sha1: c956394fce7e74f741e4ae8c256b480904ad5942
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.8
+  version: 1.1.8

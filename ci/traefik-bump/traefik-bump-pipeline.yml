@@ -111,6 +111,12 @@ jobs:
 
                     bosh blobs
 
+                    echo "Updating 'scripts/add-blobs.sh' utility."
+                    traefik_sha256=$(bosh blobs --column path --column digest | awk '/traefik\/traefik-[0-9.]+_linux-amd64\.gz/{sub("^sha256:", "", $2); print $2}')
+                    sed -i -re "/TRAEFIK_VERSION=/s/=[0-9.]+\$/=${latest_traefik_version}/" "scripts/add-blobs.sh"
+                    sed -i -re "/TRAEFIK_SHA256=/s/=[0-9a-f]+\$/=${traefik_sha256}/" "scripts/add-blobs.sh"
+                    grep -E -nC 2 "TRAEFIK_(VERSION|SHA256)=" "scripts/add-blobs.sh"
+
                     git config --global "color.ui" "always"
                     git status
                     git diff | cat

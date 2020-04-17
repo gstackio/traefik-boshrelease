@@ -5,7 +5,7 @@ resource_types:
     type: docker-image
     source:
       repository: swce/keyval-resource
- 
+
 resources:
   - name: kinja-image
     type: docker-image
@@ -62,6 +62,7 @@ jobs:
             trigger: true
             params: { globs: [ "*_linux-amd64" ] }
           - get: traefik-boshrelease-master
+          - get: gk-automation
           - get: kinja-image
 
       - task: add-blob

@@ -11,3 +11,14 @@
 - path: /instance_groups/name=traefik/jobs/name=traefik/properties?/traefik/http/enabled
   type: replace
   value: true
+
+# the default TLS certificate  must  be deactivated, so the
+# `disable-default-tls-certificate.yml` ops file is inlined here
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/tls/cert
+  type: remove
+
+- path: /variables/name=traefik_ca
+  type: remove
+
+- path: /variables/name=traefik_tls
+  type: remove

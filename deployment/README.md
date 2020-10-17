@@ -41,7 +41,10 @@ certificates. The HTTP-01 challenge is used.
 When the default kind-of-self-signed TLS certificate doesn't suit your needs,
 then use this operation file to remove it.
 
-This should not be enable when using the `enable-lets-encrypt.yml` ops file.
+(With v1.1.0 and before, default TLS certificates were necessary for the HTTPS
+challenge to properly work. Now with v1.2.0 and onwards using the HTTP-01
+challenge, the default TLS certificate must be deactivated, so this ops file
+has been inlined into `enable-lets-encrypt.yml`.)
 
 
 ### `operations/enable-api.yml`

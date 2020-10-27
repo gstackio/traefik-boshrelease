@@ -4,9 +4,9 @@
   type: replace
   value:
     name: gk-consul
-    sha1: b5164d5f3afaee131616ff864e33f8ca00186c29
+    sha1: 7208cd030fc4da7bc2ab7dfb8d1308706ff11570
     stemcell:
       os: ubuntu-xenial
-      version: "621.69"
-    url: https://s3.eu-west-3.amazonaws.com/gk-consul-boshrelease/compiled-releases/gk-consul/gk-consul-1.3.0-ubuntu-xenial-621.69-20200417-222714-08829434-20200417222717.tgz
-    version: 1.3.0
+      version: "621.90"
+    url: https://s3.eu-west-3.amazonaws.com/gk-consul-boshrelease/compiled-releases/gk-consul/gk-consul-1.4.0-ubuntu-xenial-621.90-20201027-114400-925889247-20201027114404.tgz
+    version: 1.4.0

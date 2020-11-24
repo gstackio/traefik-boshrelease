@@ -11,13 +11,13 @@
         if not traefik.p('traefik.api.enabled')
 -%>
 echo "FATAL: smoke tests require the API to be enabled." \
-    "Please set the 'traefik.api.enabled' property of the 'teraefik' job to 'true'."
+    "Please set the 'traefik.api.enabled' property of the 'traefik' job to 'true'."
 <%
         end
         if not traefik.p('traefik.rest.enabled')
 -%>
 echo "FATAL: smoke tests require the REST provider to be enabled." \
-    "Please set the 'traefik.rest.enabled' property of the 'teraefik' job to 'true'."
+    "Please set the 'traefik.rest.enabled' property of the 'traefik' job to 'true'."
 <%
         end
 -%>

@@ -43,12 +43,6 @@ meta:
     email:  ((git-commit-email))
     name:   ((git-commit-name))
 
-  bosh-lite:
-    target:   ((bosh-lite-environment))
-    cacert:   ((bosh-lite-ca-cert))
-    username: ((bosh-lite-client))
-    password: ((bosh-lite-client-secret))
-
   aws:
     bucket:      (( grab meta.pipeline ))
     region_name: eu-west-3

@@ -8,7 +8,7 @@ pushd "${SCRIPT_DIR}" > /dev/null
 
 (
     set -x
-    fly --target="gk" \
+    fly --target="gk-plat-devs" \
         set-pipeline --pipeline="traefik-bump" \
         --config="traefik-bump-pipeline.yml" \
         --load-vars-from="../config.yml"

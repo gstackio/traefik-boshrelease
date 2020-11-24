@@ -4,7 +4,7 @@ meta:
   target:  gk
   url:     https://ci.gstack.io
 
-  test-errands: "smoke-tests"
+  test-errands: smoke-tests
 
   initial_version: "1.3.0"
 
@@ -66,8 +66,6 @@ meta:
     stemcell:
       cpi: "warden-boshlite"
     deployment-clustering:   (( concat meta.name "-testflight-clustering" ))
-
-  test-errands: smoke-tests
 
   slack:
     webhook:       ((slack-webhook))

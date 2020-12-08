@@ -1,6 +1,15 @@
 ---
 name: ((deployment_name))
 
+# NOTE: this deployment requires the BOSH DNS add-on to be collocated by some
+# runtime-config to be setup on the BOSH Director.
+#
+# See:
+#   - https://bosh.io/docs/dns/#dns-release
+#   - https://github.com/cloudfoundry/bosh-deployment/blob/master/runtime-configs/dns.yml
+features:
+  use_dns_addresses: true
+
 instance_groups:
   - name: traefik
     instances: 1
@@ -8,6 +17,12 @@ instance_groups:
     jobs:
       - name: traefik
         release: traefik
+        provides:
+          traefik-address:
+            as: traefik-server-address
+            aliases:
+              - domain: traefik.service.traefik.internal
+                health_filter: smart
         properties:
           traefik:
             log_level: INFO
@@ -45,10 +60,9 @@ variables:
       alternative_names:
         - ((traefik_domain))
         - "*.((traefik_domain))"
+    consumes:
+      alternative_name: { from: traefik-server-address }
     update_mode: converge
-
-features:
-  use_dns_addresses: true
 
 update:
   serial: false

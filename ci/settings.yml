@@ -62,7 +62,7 @@ meta:
 
   bosh:
     stemcell:
-      cpi: "warden-boshlite"
+      cpi: warden-boshlite
     deployment-clustering:   (( concat meta.name "-testflight-clustering" ))
 
   slack:

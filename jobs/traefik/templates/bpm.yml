@@ -6,9 +6,18 @@ processes:
     executable: /var/vcap/packages/traefik/bin/traefik
     args:
       - --configfile=/var/vcap/jobs/traefik/conf/traefik.toml
+<%
+    if p('traefik.http.port') < 1024 or
+        p('traefik.tls.port') < 1024 or
+        p('traefik.web.port') < 1024 or
+        p('traefik.api.tls.port') < 1024
+-%>
     capabilities:
       # Allow Traefik to bind sockets to Internet domain privileged ports
       # (port numbers less than 1024):
       - NET_BIND_SERVICE
+<% end -%>
     ephemeral_disk: true
+<% if p('traefik.acme.enabled') -%>
     persistent_disk: true
+<% end -%>

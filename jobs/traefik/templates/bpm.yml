@@ -21,3 +21,6 @@ processes:
 <% if p('traefik.acme.enabled') -%>
     persistent_disk: true
 <% end -%>
+    additional_volumes:
+      - path: /var/vcap/jobs/traefik/conf
+        writable: true

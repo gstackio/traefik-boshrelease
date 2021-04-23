@@ -266,6 +266,7 @@ jobs:
       - in_parallel:
           - get: gk-consul-boshrelease-gh-release
             trigger: true
+            params: { globs: [] }
           - get: traefik-boshrelease-master
           - get: gk-automation
           - get: gk-ops-image

@@ -2,9 +2,12 @@
 
 set -ex
 
-mkdir "$BOSH_INSTALL_TARGET/bin"
+readonly TRAEFIK_VERSION=1.7.26
 
-gzip -dc traefik/traefik-*_linux-amd64.gz \
-	> "$BOSH_INSTALL_TARGET/bin/traefik"
+bin_dir="${BOSH_INSTALL_TARGET}/bin"
+mkdir -p "${bin_dir}"
 
-chmod +x "$BOSH_INSTALL_TARGET/bin/traefik"
+gzip -dc "traefik/traefik-${TRAEFIK_VERSION}_linux-amd64.gz" \
+	> "${bin_dir}/traefik"
+
+chmod +x "${bin_dir}/traefik"

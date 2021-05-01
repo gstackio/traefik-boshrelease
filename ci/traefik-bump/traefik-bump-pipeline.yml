@@ -3,6 +3,7 @@
 resources:
   - name: gk-ops-image
     type: docker-image
+    icon: docker
     source:
       repository: harbor.ci.gstack.io/gstack/gk-ops
       username: ((docker_registry_username))
@@ -10,6 +11,7 @@ resources:
 
   - name: traefik-gh-release
     type: github-release
+    icon: github
     source:
       owner: containous
       repository: traefik
@@ -19,6 +21,7 @@ resources:
 
   - name: gk-consul-boshrelease-gh-release
     type: github-release
+    icon: github
     source:
       owner: gstackio
       repository: gk-consul-boshrelease
@@ -28,6 +31,7 @@ resources:
 
   - name: gk-automation
     type: git
+    icon: github
     source:
       uri: git@github.com:gstackio/gk-automation.git
       branch: master
@@ -40,6 +44,7 @@ resources:
 
   - name: traefik-boshrelease-master
     type: git
+    icon: github
     source:
       uri: ((traefik_release_git_uri))
       branch: master

@@ -1,6 +1,7 @@
 ---
 meta:
   name:    traefik
+  release: Træfik BOSH Release
   target:  gk-plat-devs
   url:     https://ci.gstack.io
   team:    gk-plat-devs

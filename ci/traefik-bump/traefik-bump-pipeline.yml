@@ -87,12 +87,12 @@ jobs:
         file: gk-automation/tasks/boshrelease/bump-blob.yml
         input_mapping:
           artifact-release: artifact-gzipped
-          boshrelease-repo: traefik-boshrelease-master
+          boshrelease-repo: repo-branched
         params:
           ARTIFACT_HUMAN_NAME:      Traefik binary
           ARTIFACT_FILE_TEMPLATE:   traefik_linux-amd64.gz
           BLOB_PATH_AWK_PATTERN:    traefik\/traefik-[0-9.]+_linux-amd64\.gz
-          BLOB_PATH_TEMPLATE:       traefik/traefik-${blob_version}_linux-amd64.gz
+          BLOB_PATH_TEMPLATE:       traefik/traefik-${artifact_version}_linux-amd64.gz
           PACKAGE_NAME:             traefik
           ARTIFACT_REF_VARS_PREFIX: TRAEFIK
 
@@ -118,7 +118,7 @@ jobs:
         image: gk-ops-image
         file: gk-automation/tasks/git/commit.yml
         input_mapping:
-          repo: traefik-boshrelease-blobs-uploaded
+          repo: boshrelease-repo-blobs-uploaded
         params:
           GIT_COMMIT_MESSAGE: "Uploaded blob for new Traefik binary"
           GIT_COMMIT_NAME:    ((git-commit-name))
@@ -138,7 +138,7 @@ jobs:
         file: gk-automation/tasks/boshrelease/compose-pr.yml
         params:
           ARTIFACT_HUMAN_NAME:    Traefik
-          RELEASE_NOTES_URL_TMPL: https://github.com/containous/traefik/releases/tag/v${latest_version}
+          RELEASE_NOTES_URL_TMPL: https://github.com/containous/traefik/releases/tag/v${artifact_version}
 
       - task: submit-pr
         image: gk-ops-image

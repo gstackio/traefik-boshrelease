@@ -106,3 +106,13 @@ jobs:
             MANIFEST_PATH:        (( grab meta.manifest.path ))
             MANIFEST_VARS:        (( grab meta.manifest.vars-clustering ))
             MANIFEST_OP_PATHS:    (( concat meta.manifest.operator_file_paths " " meta.manifest.operator_file_paths-clustering ))
+
+resources:
+
+  - name: git
+    check_every: 24h
+    webhook_token: ((concourse-webhook-token))
+
+  - name: git-pull-requests
+    check_every: 24h
+    webhook_token: ((concourse-webhook-token))

@@ -2,7 +2,7 @@
 
 set -ex
 
-readonly TRAEFIK_VERSION=1.7.26
+readonly TRAEFIK_VERSION=1.7.30
 
 bin_dir="${BOSH_INSTALL_TARGET}/bin"
 mkdir -p "${bin_dir}"

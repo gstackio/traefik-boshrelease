@@ -74,11 +74,19 @@ jobs:
           BRANCH_NAME_TEMPLATE: bump-traefik-${artifact_version}
           GITHUB_PRIVATE_KEY:   ((github-private-key))
 
+      - task: set-timestamp
+        image: gk-ops-image
+        file: gk-automation/tasks/github/force-release-artifact-timestamp.yml
+        input_mapping:
+          github-release: traefik-gh-release
+        params:
+          ARTIFACT_FILE: traefik_linux-amd64
+
       - task: gzip-artifact
         image: gk-ops-image
         file: gk-automation/tasks/gzip-file.yml
         input_mapping:
-          artifact: traefik-gh-release
+          artifact: github-release-timestamped
         params:
           ARTIFACT_FILE: traefik_linux-amd64
 

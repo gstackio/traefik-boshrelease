@@ -66,6 +66,7 @@ meta:
 
   bosh:
     stemcell:
+      major: 1
       cpi: warden-boshlite
     deployment-clustering:   (( concat meta.name "-testflight-clustering" ))
 
@@ -116,3 +117,6 @@ resources:
   - name: git-pull-requests
     check_every: 24h
     webhook_token: ((concourse-webhook-token))
+
+  - name: (( concat meta.bosh.stemcell.os "-stemcell-" meta.bosh.stemcell.major ))
+    old_name: (( concat meta.bosh.stemcell.os "-stemcell-0" ))

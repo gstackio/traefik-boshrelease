@@ -17,6 +17,11 @@ properties:
     description: |
       Hostname to query when querying the Traefik frontend.
 
+      When 'traefik.acme.enabled' is true for the Traefik instance group
+      pointed by the 'traefik' Bosh link above, then this 'frontend_hostname'
+      must be a DNS anme for which Traefik will be able to generate a valid
+      Let's Encrypt certificate.
+
       When 'frontend_hostname' is a DNS name for which no Let's Encrypt
       certificate can be provisioned (like 'mockbin.example.com'), then Let's
       Encrypt must be deactivated.

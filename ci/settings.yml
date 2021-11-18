@@ -117,6 +117,3 @@ resources:
   - name: git-pull-requests
     check_every: 24h
     webhook_token: ((concourse-webhook-token))
-
-  - name: (( concat meta.bosh.stemcell.os "-stemcell-" meta.bosh.stemcell.major ))
-    old_name: (( concat meta.bosh.stemcell.os "-stemcell-0" ))

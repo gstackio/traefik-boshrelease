@@ -2,7 +2,7 @@
 
 - Switch to using Bionic stemcells.
 
-- Bump Træfik to the latest version [1.7.30](https://github.com/containous/traefik/releases/tag/v1.7.30).
+- Bump Træfik to the latest version [1.7.33](https://github.com/containous/traefik/releases/tag/v1.7.33).
 
 - Bump the [Consul release](https://github.com/gstackio/gk-consul-boshrelease) to v1.6.0 in the `clustering.yml` and `clustering-compiled-release.yml` ops files.
 

@@ -2,8 +2,8 @@
 
 set -eo pipefail -u -x
 
-TRAEFIK_VERSION=1.7.33
-TRAEFIK_SHA256=5d283f7edeca37a091bed4ff0e3f0b25825529bb494fa48ed8f4b96e7181d51f
+TRAEFIK_VERSION=1.7.34
+TRAEFIK_SHA256=5780529dd43c993a968d33e3409f08dfde549d522e2f35b86d10be097efb25b3
 
 if [[ ! -f "traefik-${TRAEFIK_VERSION}_linux-amd64" && ! -f "traefik-${TRAEFIK_VERSION}_linux-amd64.gz" ]]; then
     curl -L "https://github.com/containous/traefik/releases/download/v$TRAEFIK_VERSION/traefik_linux-amd64" \

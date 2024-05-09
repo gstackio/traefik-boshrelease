@@ -3,6 +3,7 @@ name: smoke-tests
 
 templates:
   bin/run: bin/run
+  bin/mockbin.py: bin/mockbin.py
   tls/api-entrypoint-ca.crt: tls/api-entrypoint-ca.crt
   tls/traefik-default-ca.crt: tls/traefik-default-ca.crt
 
@@ -26,3 +27,18 @@ properties:
       certificate can be provisioned (like 'mockbin.example.com'), then Let's
       Encrypt must be deactivated.
     default: mockbin.example.com
+
+  mockbin_backend_port:
+    description: |
+      The TCP port on which the 'mockbin' HTTP server implementation will
+      listen for web requests.
+
+      For the sake of properly testing the Traefik proxy, this job will run an
+      instance of a very simple 'mockbin' HTTP server implementation, which
+      will act as a server backend for the Traefik acting as a proxy.
+
+      This simple 'mockbin' implementation will run on the instance (VM) where
+      the smoke tests are running. Thus operators should ensure that the
+      Traefik proxy can reach to the smoke tests instance through the network
+      on the specified TCP port.
+    default: 8080

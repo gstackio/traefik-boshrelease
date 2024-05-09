@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 <%
+    require "json"
     require "shellwords"
     def esc(x)
         Shellwords.shellescape(x)
@@ -62,6 +63,8 @@ if [[ ! "${MAIN_TRAEFIK_IP}" =~ "^[0-9.]+$" ]]; then
     MAIN_TRAEFIK_IP=$(host "${MAIN_TRAEFIK_IP}" | head -n1 | cut -d" " -f4)
 fi
 
+MOCKBIN_BACKEND_JSON=<%= esc("http://#{spec.address}:#{p("mockbin_backend_port").to_i}".to_json) %>
+
 # setup cleanup framework
 defer_stack=()
 function defer() {
@@ -80,6 +83,7 @@ function run_deferred() {
 
 trap run_deferred EXIT
 
+
 # setup .netrc for curl to fetch the login name and password
 export HOME=/var/vcap/data/smoke-tests/fake-home
 mkdir -p "${HOME}"
@@ -92,6 +96,21 @@ function cleanup_netrc() {
     rm -f "${HOME}/.netrc"
 }
 defer cleanup_netrc
+
+
+# run our own 'mockbin' HTTP server implementation
+MOCKBIN_HTTP_SERVER_PID=0
+function terminate_http_server() {
+    if [[ ${MOCKBIN_HTTP_SERVER_PID} -gt 0 ]]; then
+        kill "${MOCKBIN_HTTP_SERVER_PID}"
+    fi
+}
+defer terminate_http_server
+
+python3 "${JOB_DIR}/bin/mockbin.py" &
+MOCKBIN_HTTP_SERVER_PID=$!
+
+
 
 function request() {
     local base=$1 ca_name=$2 verb=$3 uri_path=$4; shift 4
@@ -172,7 +191,7 @@ api PUT "/api/providers/rest" \
                 "mockbin-http-backend": {
                     "servers": {
                         "http-server": {
-                            "url": "http://mockbin.org:80",
+                            "url": '"${MOCKBIN_BACKEND_JSON}"',
                             "weight": 0
                         }
                     },
@@ -183,7 +202,7 @@ api PUT "/api/providers/rest" \
                 "mockbin-https-backend": {
                     "servers": {
                         "https-server": {
-                            "url": "https://mockbin.org:443",
+                            "url": '"${MOCKBIN_BACKEND_JSON}"',
                             "weight": 0
                         }
                     },

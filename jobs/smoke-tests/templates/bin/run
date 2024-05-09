@@ -53,6 +53,7 @@ exec \
     1> >(prepend_datetime >&3) \
     2>&1
 
+readonly JOB_DIR="/var/vcap/jobs/smoke-tests"
 readonly API_BASE_URI=<%= esc("https://#{main_address}:#{api_tls_port}") %>
 readonly PXY_BASE_URI=<%= esc("#{pxy_scheme}://#{frontend_hostname}:#{pxy_port}") %>
 
@@ -98,7 +99,7 @@ function request() {
     (
         set -x
         curl --silent --fail --show-error --location \
-            --cacert "/var/vcap/jobs/smoke-tests/tls/${ca_name}.crt" \
+            --cacert "${JOB_DIR}/tls/${ca_name}.crt" \
             --request "${verb}" \
             --url "${base}${uri_path}" \
             "$@" \

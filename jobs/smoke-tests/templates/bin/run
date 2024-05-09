@@ -56,6 +56,11 @@ exec \
 readonly API_BASE_URI=<%= esc("https://#{main_address}:#{api_tls_port}") %>
 readonly PXY_BASE_URI=<%= esc("#{pxy_scheme}://#{frontend_hostname}:#{pxy_port}") %>
 
+MAIN_ADDRESS_RESOLVED=<%= esc("#{main_address}") %>
+if [[ ! "${MAIN_ADDRESS_RESOLVED}" =~ "^[0-9.]+$" ]]; then
+    MAIN_ADDRESS_RESOLVED=$(host "${MAIN_ADDRESS_RESOLVED}" | head -n1 | cut -d" " -f4)
+fi
+
 # setup cleanup framework
 defer_stack=()
 function defer() {
@@ -108,23 +113,15 @@ function api() {
 }
 
 function proxy_https() {
-    local main_address=<%= esc("#{main_address}") %>
-    if [[ ! "${main_address}" =~ "^[0-9.]+$" ]]; then
-        main_address=$(host "${main_address}" | head -n1 | cut -d" " -f4)
-    fi
     request "${PXY_BASE_URI}" "traefik-default-ca" "$@" \
-        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${main_address}" \
+        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${MAIN_ADDRESS_RESOLVED}" \
         --insecure
 }
 
 function proxy_http() {
-    local main_address=<%= esc("#{main_address}") %>
-    if [[ ! "${main_address}" =~ "^[0-9.]+$" ]]; then
-        main_address=$(host "${main_address}" | head -n1 | cut -d" " -f4)
-    fi
     request <%= esc("http://#{frontend_hostname}:80") %> "traefik-default-ca" "$@" \
-        --resolve <%= esc("#{frontend_hostname}") %>":80:${main_address}" \
-        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${main_address}" \
+        --resolve <%= esc("#{frontend_hostname}") %>":80:${MAIN_ADDRESS_RESOLVED}" \
+        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${MAIN_ADDRESS_RESOLVED}" \
         --insecure
 }
 

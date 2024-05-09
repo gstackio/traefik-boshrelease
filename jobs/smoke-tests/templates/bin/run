@@ -57,9 +57,9 @@ readonly JOB_DIR="/var/vcap/jobs/smoke-tests"
 readonly API_BASE_URI=<%= esc("https://#{main_address}:#{api_tls_port}") %>
 readonly PXY_BASE_URI=<%= esc("#{pxy_scheme}://#{frontend_hostname}:#{pxy_port}") %>
 
-MAIN_ADDRESS_RESOLVED=<%= esc("#{main_address}") %>
-if [[ ! "${MAIN_ADDRESS_RESOLVED}" =~ "^[0-9.]+$" ]]; then
-    MAIN_ADDRESS_RESOLVED=$(host "${MAIN_ADDRESS_RESOLVED}" | head -n1 | cut -d" " -f4)
+MAIN_TRAEFIK_IP=<%= esc("#{main_address}") %>
+if [[ ! "${MAIN_TRAEFIK_IP}" =~ "^[0-9.]+$" ]]; then
+    MAIN_TRAEFIK_IP=$(host "${MAIN_TRAEFIK_IP}" | head -n1 | cut -d" " -f4)
 fi
 
 # setup cleanup framework
@@ -115,14 +115,14 @@ function api() {
 
 function proxy_https() {
     request "${PXY_BASE_URI}" "traefik-default-ca" "$@" \
-        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${MAIN_ADDRESS_RESOLVED}" \
+        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${MAIN_TRAEFIK_IP}" \
         --insecure
 }
 
 function proxy_http() {
     request <%= esc("http://#{frontend_hostname}:80") %> "traefik-default-ca" "$@" \
-        --resolve <%= esc("#{frontend_hostname}") %>":80:${MAIN_ADDRESS_RESOLVED}" \
-        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${MAIN_ADDRESS_RESOLVED}" \
+        --resolve <%= esc("#{frontend_hostname}") %>":80:${MAIN_TRAEFIK_IP}" \
+        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${MAIN_TRAEFIK_IP}" \
         --insecure
 }
 

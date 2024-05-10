@@ -81,7 +81,7 @@ See the [CONTRIBUTING](CONTRIBUTING.md) docs for more details.
 Author and License
 ------------------
 
-Copyright © 2018-present, Benjamin Gandon
+Copyright © 2018-present, Benjamin Gandon, Gstack
 
 Like the rest of BOSH, the Træfik BOSH release is released under the terms
 of the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).

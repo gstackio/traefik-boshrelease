@@ -2,6 +2,34 @@ Contributing
 ============
 
 
+Version bumps
+-------------
+
+The “bump” pipeline is here to help bumping Traefik version.
+
+When a pull request is submitted by the pipeline, the Traefik configuration
+template in `jobs/traefik/templates/conf/traefik.toml` should be inspected for
+any required evolution.
+
+The helper `scripts/check-config.sh` is designed to assist that task.
+
+As requirements, the `colordiff` utility must be installed first, and the
+`TRAEFIK_REPO` environment variable must point to a Git directory where the
+`traefik` new version has been checked out.
+
+For a first run, adapt the following example commands to your context:
+
+```shell
+cd traefik-boshrelease
+git clone --branch "v1.7" -- https://github.com/containous/traefik.git ../traefik
+TRAEFIK_REPO=../traefik scripts/check-config.sh
+```
+
+This will display a diff between current configuration ERB template, and new
+configuration examples, so that you have a chance to spot any evolutions, that
+you would then port to the configurtion ERB template.
+
+
 Testing
 -------
 

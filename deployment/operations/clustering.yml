@@ -167,6 +167,6 @@
   type: replace
   value:
     name: gk-consul
-    sha1: c627cfe6fef092d3b2c21904b7c6df009309ad5f
-    url: https://github.com/gstackio/gk-consul-boshrelease/releases/download/v1.6.0/gk-consul-1.6.0.tgz
-    version: 1.6.0
+    sha1: a04b6e995221bfdea0524691b6f715ea7b2f6b16
+    url: https://github.com/gstackio/gk-consul-boshrelease/releases/download/v1.7.0/gk-consul-1.7.0.tgz
+    version: 1.7.0

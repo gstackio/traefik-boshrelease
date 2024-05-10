@@ -1,0 +1,6 @@
+---
+deployment_name: traefik-testflight
+network_name: default
+traefik_domain: example.com
+api_username: admin-testflight
+smoke_tests_frontend_hostname: mockbin.example.com

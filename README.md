@@ -62,6 +62,7 @@ Contributing
 
 Please feel free to submit issues and pull requests.
 
+See the [CONTRIBUTING](CONTRIBUTING.md) docs for more details.
 
 
 Author and License

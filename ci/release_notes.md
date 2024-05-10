@@ -2,7 +2,7 @@
 
 - Switch to using Jammy stemcells.
 
-- Bump Træfik to the latest version [1.7.33](https://github.com/containous/traefik/releases/tag/v1.7.33).
+- Bump Træfik to the latest version [1.7.34](https://github.com/containous/traefik/releases/tag/v1.7.34).
 
 - Bump the [Consul release](https://github.com/gstackio/gk-consul-boshrelease) to v1.6.0 in the `clustering.yml` and `clustering-compiled-release.yml` ops files.
 

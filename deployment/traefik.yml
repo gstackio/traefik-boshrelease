@@ -80,9 +80,9 @@ stemcells:
 
 releases:
 - name: traefik
-  sha1: d504c6a5e52056e3d87117d7031c06e21658109e
-  url: https://github.com/gstackio/traefik-boshrelease/releases/download/v1.15.0/traefik-1.15.0.tgz
-  version: 1.15.0
+  sha1: 896eaeed289b6ec5670029ed5f30e28ccb1b3d87
+  url: https://github.com/gstackio/traefik-boshrelease/releases/download/v1.16.0/traefik-1.16.0.tgz
+  version: 1.16.0
 - name: bpm
   sha1: 8052def173f1e1d87dcbbce353dd2e6d1df96177
   url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.2.19

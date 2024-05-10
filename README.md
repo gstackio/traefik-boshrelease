@@ -57,6 +57,19 @@ An example for a Træfik deployment that is integrated to Cloud Foundry is
 available in the [Easy Foundry distribution](https://github.com/gstackio/gstack-bosh-environment).
 
 
+Caveat
+------
+
+When deployed in front of a Cloud Foundry installation, any attacker can forge
+any DNS, run an HTTPS request on Traefik, and trigger a certificate
+generation. When Let's Encrypt quotas are exceeded and a vertificate needs
+re-generating, this may lead to deny-of-Service.
+
+This is due to Traefik not being aware of the existing routes in Cloud
+Foundry. Indeed Traefik should not generate any certificate for non-existing
+routes, and just serve a 502 response using the default certificate.
+
+
 Contributing
 ------------
 

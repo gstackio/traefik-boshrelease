@@ -1,12 +1,16 @@
 ### Improvements
 
-- Switch to using Bionic stemcells.
+- Switch to using Jammy stemcells.
 
 - Bump Træfik to the latest version [1.7.33](https://github.com/containous/traefik/releases/tag/v1.7.33).
 
 - Bump the [Consul release](https://github.com/gstackio/gk-consul-boshrelease) to v1.6.0 in the `clustering.yml` and `clustering-compiled-release.yml` ops files.
 
-- Improved Concourse pipelines.
+- Bump BPM to v1.2.19 in the `traefik.yml` deployment manifest.
+
+- Improved Concourse pipelines, re-generated from Cloud Foundry community-maintained [pipeline templates](https://github.com/cloudfoundry-community/pipeline-templates).
+
+- For contributors, provide more documentation and share helper scripts for manual testing and version bumps.
 
 
 ### Caveats

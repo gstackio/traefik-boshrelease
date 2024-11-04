@@ -87,6 +87,6 @@ releases:
   url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.16.0-ubuntu-jammy-1.439-20240510-130025-202449439-20240510130025.tgz
   version: 1.16.0
 - name: bpm
-  sha1: 226e8937b89408930cdbb91f1879cf42c301c3e5
-  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.2
-  version: 1.4.2
+  sha1: ef03d0d3d7a2a01d0df10dd34eab458096909d68
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.3
+  version: 1.4.3
